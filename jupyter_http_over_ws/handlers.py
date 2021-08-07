@@ -32,6 +32,8 @@ from tornado import websocket
 HANDLER_VERSION = version.StrictVersion('0.0.7')
 # LINT.ThenChange(pkg_files/setup.py:handler_version)
 
+HANDLER_NOTEBOOK_PORT = ''
+
 ExtensionVersionResult = collections.namedtuple('ExtensionVersionResult', [
     'error_reason',
     'requested_extension_version',
@@ -259,6 +261,7 @@ class HttpOverWebSocketHandler(_WebSocketHandlerBase):
         header_callback=emitter.header_callback,
         streaming_callback=emitter.streaming_callback,
         allow_nonstandard_methods=True)
+    _modify_proxy_request_port(proxy_request)
     _modify_proxy_request_test_only(proxy_request)
 
     http_client = self._get_http_client()
@@ -431,6 +434,7 @@ class ProxiedSocketHandler(_WebSocketHandlerBase):
         headers=self.request.headers,
         body=None,
         ca_certs=self.ca_certs)
+    _modify_proxy_request_port(proxy_request)
     _modify_proxy_request_test_only(proxy_request)
 
     client = yield websocket.websocket_connect(
@@ -491,6 +495,13 @@ class ProxiedSocketHandler(_WebSocketHandlerBase):
     self.close(code, 'Uncaught error when proxying request')
 
 
+def _modify_proxy_request_port(proxy_request):
+  url = urlparse.urlparse(proxy_request.url)
+  proxy_request.url = url._replace(netloc='localhost:' + HANDLER_NOTEBOOK_PORT).geturl()
+  if 'Host' in list(proxy_request.headers.keys()):
+    proxy_request.headers["Host"] = 'localhost:' + HANDLER_NOTEBOOK_PORT
+
+    
 def _modify_proxy_request_test_only(unused_request):
   """Hook for modifying the request before making a fetch (test-only)."""
 
@@ -528,6 +539,7 @@ def _perform_request_and_extract_cookies(request_url, ca_certs, http_client):
       headers=None,
       body=None,
       ca_certs=ca_certs)
+  _modify_proxy_request_port(proxy_request)
   _modify_proxy_request_test_only(proxy_request)
 
   response = yield http_client.fetch(proxy_request, raise_error=False)

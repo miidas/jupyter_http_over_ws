@@ -34,6 +34,8 @@ def _handler_rule(app, handler_class):
 
 def load_jupyter_server_extension(nb_server_app):
   """Called by Jupyter when this module is loaded as a server extension."""
+  handlers.HANDLER_NOTEBOOK_PORT = str(nb_server_app.port)
+  
   app = nb_server_app.web_app
   host_pattern = '.*$'
 
