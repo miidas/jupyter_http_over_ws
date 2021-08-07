@@ -10,7 +10,7 @@ to localhost via WebSocket.
 Run the following commands in a shell:
 
 ```shell
-pip install jupyter_http_over_ws
+pip install git+https://github.com/miidas/jupyter_http_over_ws
 # Optional: Install the extension to run every time the notebook server starts.
 # Adds a /http_over_websocket endpoint to the Tornado notebook server.
 jupyter serverextension enable --py jupyter_http_over_ws
