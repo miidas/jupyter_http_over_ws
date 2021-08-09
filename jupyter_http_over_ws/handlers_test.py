@@ -182,6 +182,7 @@ class _TestBase(six.with_metaclass(abc.ABCMeta)):
     app = web.Application(self.get_test_handlers(), **settings)
 
     nb_server_app = FakeNotebookServer(app)
+    nb_server_app.port = urlparse.urlparse(self.get_server_base_url()).port
     jupyter_http_over_ws.load_jupyter_server_extension(nb_server_app)
 
     # For HTTPS servers, we disable certificate validation.
