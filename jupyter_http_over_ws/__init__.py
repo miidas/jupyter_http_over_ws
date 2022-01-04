@@ -15,6 +15,7 @@
 
 from jupyter_http_over_ws import handlers
 from notebook import utils
+import types
 
 __all__ = ['load_jupyter_server_extension', 'handlers']
 
@@ -32,10 +33,16 @@ def _handler_rule(app, handler_class):
                               handler_class.PATH), handler_class)
 
 
+def _notebook_info(self, kernel_count=True):
+  handlers.HANDLER_NOTEBOOK_PORT = str(self.port)
+  return self.notebook_info_orig(kernel_count=kernel_count)
+
+
 def load_jupyter_server_extension(nb_server_app):
   """Called by Jupyter when this module is loaded as a server extension."""
-  handlers.HANDLER_NOTEBOOK_PORT = str(nb_server_app.port)
-  
+  nb_server_app.notebook_info_orig = nb_server_app.notebook_info
+  nb_server_app.notebook_info = types.MethodType(_notebook_info, nb_server_app)
+
   app = nb_server_app.web_app
   host_pattern = '.*$'
 

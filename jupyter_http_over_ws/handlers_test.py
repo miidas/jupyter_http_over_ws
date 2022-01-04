@@ -137,6 +137,8 @@ class FakeNotebookServer(object):
   def __init__(self, app):
     self.web_app = app
 
+  def notebook_info(self, kernel_count=True):
+    return ''
 
 class AlwaysThrowingHTTPClient(httpclient.AsyncHTTPClient):
 
@@ -184,6 +186,7 @@ class _TestBase(six.with_metaclass(abc.ABCMeta)):
     nb_server_app = FakeNotebookServer(app)
     nb_server_app.port = urlparse.urlparse(self.get_server_base_url()).port
     jupyter_http_over_ws.load_jupyter_server_extension(nb_server_app)
+    nb_server_app.notebook_info()
 
     # For HTTPS servers, we disable certificate validation.
     def _modify_proxy_request_test_only(request):
