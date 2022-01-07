@@ -51,5 +51,5 @@ def load_jupyter_server_extension(nb_server_app):
       _handler_rule(app, handlers.HttpOverWebSocketDiagnosticHandler),
       _handler_rule(app, handlers.ProxiedSocketHandler),
   ])
-  print('jupyter_http_over_ws extension initialized. Listening on '
+  nb_server_app.log.info('jupyter_http_over_ws extension initialized. Listening on '
         '/http_over_websocket')
